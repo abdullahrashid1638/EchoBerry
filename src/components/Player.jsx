@@ -13,15 +13,12 @@ import {
 import { Howl } from 'howler'
 import { songs } from '../assets/music/songs.js'
 
-console.log(songs)
-
 function ProgressBar({ seek, setSeek, progress }) {
   const barRef = useRef(null)
 
   const handleInput = (e) => {
     const val = Number(e.target.value)
     setSeek(val)
-
     const bar = e.target
     const percentage = (val / bar.max) * 100
     gradient(percentage)
@@ -79,7 +76,6 @@ function Player() {
   // calculated song progress
   useEffect(() => {
     if (!songDuration) return
-
     const intervalId = setInterval(() => {
       const secondsPassed = songRef.current.seek()
       const percentage = (secondsPassed / songDuration) * 100
