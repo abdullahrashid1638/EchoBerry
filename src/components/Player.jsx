@@ -16,11 +16,9 @@ import { songs } from '../assets/music/songs.js'
 console.log(songs)
 
 function ProgressBar({ seek, setSeek, progress }) {
-
   const barRef = useRef(null)
 
   const handleInput = (e) => {
-
     const val = Number(e.target.value)
     setSeek(val)
 
@@ -35,13 +33,10 @@ function ProgressBar({ seek, setSeek, progress }) {
     }
   }
 
-
   useEffect(() => {
     setSeek(progress)
     gradient(progress)
   }, [progress])
-
-
 
   return (
     <div className="progress-bar">
@@ -58,7 +53,6 @@ function ProgressBar({ seek, setSeek, progress }) {
 }
 
 function Player() {
-
   const [isPlaying, setIsPlaying] = useState(false)
   const [songName, setSongName] = useState('Fortnight!')
   const [artistName, setArtistName] = useState('Taylor Swift')
@@ -66,10 +60,8 @@ function Player() {
   const [progress, setProgress] = useState(0)
   const [seek, setSeek] = useState(0)
 
-
   const songRef = useRef(null)
   const songIdRef = useRef(null)
-
 
   // Create Howl instance only once
   useEffect(() => {
@@ -84,10 +76,8 @@ function Player() {
     songRef.current = sound
   }, [])
 
-
   // calculated song progress
   useEffect(() => {
-
     if (!songDuration) return
 
     const intervalId = setInterval(() => {
@@ -99,13 +89,11 @@ function Player() {
     return () => clearInterval(intervalId)
   }, [songDuration])
 
-
   // seek the song if the value of the seek state changes
   useEffect(() => {
     const seconds = (seek / 100) * songDuration
     songRef.current.seek(seconds)
   }, [seek])
-
 
   // Handle isPlaying state
   useEffect(() => {
@@ -121,7 +109,6 @@ function Player() {
     }
   }, [isPlaying])
 
-
   // Handle spacebar
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -135,13 +122,10 @@ function Player() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-
   // Button controls
   const handlePlayPause = () => {
     setIsPlaying(prev => !prev)
   }
-
-
 
   return (
     <div id="player">
