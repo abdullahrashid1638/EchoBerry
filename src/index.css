@@ -10,4 +10,9 @@ body {
   align-items: center;
   justify-content: center;
   background-color: beige;
+  position: relative;
 }
+
+/* .container {
+  display: flex;
+} */

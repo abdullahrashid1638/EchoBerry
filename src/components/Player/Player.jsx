@@ -1,4 +1,4 @@
-import { React, useEffect, useState, useRef } from 'react'
+import { React, useEffect, useState, useRef, useMemo } from 'react'
 import './Player.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
@@ -11,7 +11,9 @@ import {
   faRepeat
 } from '@fortawesome/free-solid-svg-icons'
 import { Howl } from 'howler'
-import { songs } from '../assets/music/songs.js'
+import songs from '../../assets/songs'
+import Playlist from '../Playlist/Playlist'
+
 
 function ProgressBar({ seek, setSeek, progress }) {
   const barRef = useRef(null)
@@ -56,14 +58,20 @@ function Player() {
   const [songDuration, setSongDuration] = useState(null)
   const [progress, setProgress] = useState(0)
   const [seek, setSeek] = useState(0)
+  const [isPlaylistOpen, setIsPlaylistOpen] = useState(false)
 
   const songRef = useRef(null)
   const songIdRef = useRef(null)
+  const playlistButtonRef = useRef(null)
+
+  const howls = useMemo(() =>
+    songs.map(song => new Howl({ src: [song.src] }))
+  , [songs])
 
   // Create Howl instance only once
   useEffect(() => {
     const sound = new Howl({
-      src: ['src/assets/music/TTPD/01. Fortnight.flac'],
+      src: ['src/assets/TTPD/01. Fortnight.flac'],
       onload: () => {
         const duration = sound.duration()
         setSongDuration(duration)
@@ -123,6 +131,16 @@ function Player() {
     setIsPlaying(prev => !prev)
   }
 
+  useEffect(() => {
+    const playlistButton = playlistButtonRef.current
+    if (!playlistButton) return
+    const handleClick = () => {
+      setIsPlaylistOpen(prev => !prev)
+    }
+    playlistButton.addEventListener('click', handleClick)
+    return () => playlistButton.removeEventListener('click', handleClick)
+  }, [])
+
   return (
     <div id="player">
       <div className="song">
@@ -133,7 +151,7 @@ function Player() {
 
         <div className="song-cover">
           {/* <img src="src/components/default_cover.webp" alt="song-cover" /> */}
-          <img src="src/assets/music/TTPD/cover.jpg" alt="song-cover" />
+          <img src="src/assets/TTPD/cover.jpg" alt="song-cover" />
         </div>
 
         <div className="progress-bar">
@@ -160,10 +178,19 @@ function Player() {
         </div>
 
         <div className="control-playlist">
-          <FontAwesomeIcon icon={faListUl} />
+          <FontAwesomeIcon 
+            icon={faListUl} 
+            ref={playlistButtonRef} 
+            style={{ 
+              color: isPlaylistOpen ? 'grey' : 'black',
+              transform: isPlaylistOpen ? 'scale(115%)' : 'scale(100%)',
+              transition: 'transform 150ms ease-in-out'
+            }}
+          />
         </div>
       </div>
     </div>
+
   )
 }
 
