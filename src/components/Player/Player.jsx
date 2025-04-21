@@ -1,5 +1,6 @@
-import { React, useEffect, useState, useRef, useMemo } from 'react'
-import './Player.css'
+import { React, useEffect, useState, useRef, useMemo, useContext } from 'react'
+import { Howl } from 'howler'
+import { PlayerContext } from './PlayerContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faPlay,
@@ -10,9 +11,7 @@ import {
   faListUl,
   faRepeat
 } from '@fortawesome/free-solid-svg-icons'
-import { Howl } from 'howler'
-import songs from '../../assets/songs'
-import Playlist from '../Playlist/Playlist'
+import './Player.css'
 
 
 function ProgressBar({ seek, setSeek, progress }) {
@@ -58,7 +57,7 @@ function Player() {
   const [songDuration, setSongDuration] = useState(null)
   const [progress, setProgress] = useState(0)
   const [seek, setSeek] = useState(0)
-  const [isPlaylistOpen, setIsPlaylistOpen] = useState(false)
+  const { songs, isPlaylistOpen, setIsPlaylistOpen } = useContext(PlayerContext)
 
   const songRef = useRef(null)
   const songIdRef = useRef(null)
@@ -190,7 +189,6 @@ function Player() {
         </div>
       </div>
     </div>
-
   )
 }
 

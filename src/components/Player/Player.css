@@ -1,6 +1,6 @@
 #player {
   border: 0.2rem solid black;
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -21,7 +21,7 @@
   height: 18rem;
   width: 18rem;
   border: 0.15rem solid black;
-  border-radius: 1rem;
+  border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,7 +44,7 @@
 }
 
 .song-name {
-  font-size: 1.4rem;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
   font-weight: bold;
   margin-bottom: 0.2rem;
 }
@@ -178,8 +178,52 @@
 }
 
 
-@media(max-width: 690px) {
+@media (max-width: 770px) {
   #player {
-    width: 400px;
+    width: 100%;
+    border-radius: 0.5rem;
+    padding: 1rem;
+  }
+
+  .song-cover {
+    height: 12rem;
+    width: 12rem;
+    margin-bottom: 1rem;
+  }
+
+  .song-info {
+    width: 100%;
+    height: auto;
+  }
+
+  .artist-name {
+    font-size: 0.6rem;
+  }
+
+  .progress-bar {
+    width: 100%;
+    margin: 1rem 0;
+  }
+
+  .controls {
+    width: 100%;
+    flex-direction: column;
+    gap: 1rem;
+    height: auto;
+  }
+
+  .controls-shuffle-repeat,
+  .controls-main,
+  .control-playlist {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .controls-main svg {
+    margin: 0 0.8rem;
+  }
+
+  .controls svg {
+    font-size: 1.2rem;
   }
 }
