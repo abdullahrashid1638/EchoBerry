@@ -1,5 +1,4 @@
 import { React, useEffect, useState, useRef, useMemo, useContext } from 'react'
-import { Howl } from 'howler'
 import { PlayerContext } from './PlayerContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
@@ -52,63 +51,48 @@ function ProgressBar({ seek, setSeek, progress }) {
 
 function Player() {
   const [isPlaying, setIsPlaying] = useState(false)
-  const [songName, setSongName] = useState('Fortnight!')
-  const [artistName, setArtistName] = useState('Taylor Swift')
-  const [songDuration, setSongDuration] = useState(null)
   const [progress, setProgress] = useState(0)
   const [seek, setSeek] = useState(0)
-  const { songs, isPlaylistOpen, setIsPlaylistOpen } = useContext(PlayerContext)
 
-  const songRef = useRef(null)
+  const { 
+    songs, 
+    isPlaylistOpen, 
+    setIsPlaylistOpen,
+    currentSong,
+    setCurrentSong,
+  } = useContext(PlayerContext)
+
   const songIdRef = useRef(null)
   const playlistButtonRef = useRef(null)
-
-  const howls = useMemo(() =>
-    songs.map(song => new Howl({ src: [song.src] }))
-  , [songs])
-
-  // Create Howl instance only once
-  useEffect(() => {
-    const sound = new Howl({
-      src: ['src/assets/TTPD/01. Fortnight.flac'],
-      onload: () => {
-        const duration = sound.duration()
-        setSongDuration(duration)
-      }
-    })
-
-    songRef.current = sound
-  }, [])
-
+  
   // calculated song progress
   useEffect(() => {
-    if (!songDuration) return
+    if (!currentSong.duration) return
     const intervalId = setInterval(() => {
-      const secondsPassed = songRef.current.seek()
-      const percentage = (secondsPassed / songDuration) * 100
+      const secondsPassed = currentSong.howl.seek()
+      const percentage = (secondsPassed / currentSong.duration) * 100
       setProgress(percentage)
     }, 1000)
 
     return () => clearInterval(intervalId)
-  }, [songDuration])
+  }, [currentSong.duration])
 
   // seek the song if the value of the seek state changes
   useEffect(() => {
-    const seconds = (seek / 100) * songDuration
-    songRef.current.seek(seconds)
+    const seconds = (seek / 100) * currentSong.duration
+    currentSong.howl.seek(seconds)
   }, [seek])
 
   // Handle isPlaying state
   useEffect(() => {
-    const song = songRef.current
+    const song = currentSong
     if (!song) return
 
     if (isPlaying) {
-      const id = song.play()
+      const id = currentSong.howl.play()
       songIdRef.current = id
     } else {
-      song.pause(songIdRef.current)
-      setIsPlaying(songRef.current.playing())
+      currentSong.howl.pause(songIdRef.current)
     }
   }, [isPlaying])
 
@@ -144,13 +128,13 @@ function Player() {
     <div id="player">
       <div className="song">
         <div className="song-info">
-          <p className="song-name">{songName}</p>
-          <p className="artist-name">{artistName}</p>
+          <p className="song-name">{currentSong.name}</p>
+          <p className="artist-name">{currentSong.artist}</p>
         </div>
 
         <div className="song-cover">
           {/* <img src="src/components/default_cover.webp" alt="song-cover" /> */}
-          <img src="src/assets/TTPD/cover.jpg" alt="song-cover" />
+          <img src={currentSong.coverImage} alt="song-cover" />
         </div>
 
         <div className="progress-bar">

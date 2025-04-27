@@ -9,6 +9,11 @@
   padding: 1rem;
   background: white;
   z-index: 100;
+  overflow: auto;
+}
+
+.playlist::-webkit-scrollbar {
+  display: none;
 }
 
 .close-playlist-button {
@@ -28,13 +33,23 @@
   background-color: rgba(128, 128, 128, 0.288);
 }
 
+.header {
+  text-align: center;
+}
+
+.album-artist-name {
+  color: gray;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-bottom: 1px solid black;
+  margin-bottom: 1rem;
+  padding-bottom: 0.7rem;
+}
+
 .album-name,
 .folder-name {
-  text-align: center;
   font-size: 1.3rem;
-  border-bottom: 1px solid black;
-  padding-bottom: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .playlist-song {

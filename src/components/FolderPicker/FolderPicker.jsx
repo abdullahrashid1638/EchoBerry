@@ -6,7 +6,7 @@ import './FolderPicker.css'
 
 
 function FolderPicker() {
-  const { files, setFiles } = useContext(PlayerContext)
+  const { files, setFiles, songsUploaded, setSongsUploaded } = useContext(PlayerContext)
 
   const handleFiles = (e) => {
     const files = Array.from(e.target.files)
@@ -14,8 +14,10 @@ function FolderPicker() {
   }
 
   useEffect(() => {
-    console.log(files.map((file, index) => (`${file.webkitRelativePath} (${(file.size / 1024).toFixed(2)} KB)`)))
-  }, [files])
+    if (files.length > 0 && !songsUploaded) { 
+      setSongsUploaded(true);  // Set songsUploaded only once when files are selected
+    }
+  }, [files, songsUploaded]);  // Watch both files and songsUploaded  
 
   return (
     <div className='add-songs'>
