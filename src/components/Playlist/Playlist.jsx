@@ -31,7 +31,6 @@ function Playlist({ playlistName='Add new album' }) {
   
       for (const file of validAudioFiles) {
         const songIndex = file.name.slice(0, 3)
-        const songName = file.name.slice(4, file.name.lastIndexOf('.'))
         const ext = file.name.split('.').pop()
   
         const song = new Song({
@@ -66,6 +65,10 @@ function Playlist({ playlistName='Add new album' }) {
     return songs[0].artist
   }
 
+  function changeCurrentSong(song) {
+    setCurrentSong(song)
+  }
+
   return isPlaylistOpen ? (
     <div className='playlist'>
       <div className='header'>
@@ -85,10 +88,16 @@ function Playlist({ playlistName='Add new album' }) {
       {songsUploaded ? (
         <div className='playlist-songs'>
           {songs.map(song => (
-            <div className='playlist-song' key={song.index}>
+            <div 
+              className='playlist-song' key={song.index}
+              onClick={() => changeCurrentSong(song)}
+              style={{
+                background: song == currentSong ? 'rgba(128, 128, 128, 0.5)' : ''
+              }}
+            >
               <div className='playlist-song-number center'>{song.index}</div>
               <div className='playlist-song-cover center'>
-                <img src='src\assets\TTPD\cover.jpg' />
+                <img src={song.coverImage} />
               </div>
               <div className='playlist-song-name'>{song.name}</div>
               <div className='playlist-song-duration center'>{song.formattedDuration}</div>

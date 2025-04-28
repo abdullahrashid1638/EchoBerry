@@ -53,6 +53,7 @@ class Song {
     this.coverImage = metadata.coverImage || 'src/components/Player/default_cover.webp'
     this.artist = metadata.artist
     this.album = metadata.album
+    this.duration = metadata.duration
 
     const totalSeconds = Math.floor(metadata.duration) || 0
     const minutes = Math.floor(totalSeconds / 60)
@@ -68,6 +69,13 @@ class Song {
       src: [this.path],
       format: [this.extension]
     })
+  }
+
+  unloadHowl() {
+    if (this.howl) {
+      this.howl.unload()
+      this.howl = null
+    }
   }
 }
 

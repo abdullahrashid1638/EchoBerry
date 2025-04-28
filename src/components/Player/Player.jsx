@@ -53,6 +53,7 @@ function Player() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
   const [seek, setSeek] = useState(0)
+  const [loop, setLoop] = useState(false)
 
   const { 
     songs, 
@@ -64,24 +65,41 @@ function Player() {
 
   const songIdRef = useRef(null)
   const playlistButtonRef = useRef(null)
-  
-  // calculated song progress
+
+  useEffect(() => {
+    if (!currentSong) return
+    currentSong.loadHowl()
+    setProgress(0)
+    const id = currentSong.howl.play()
+    songIdRef.current = id
+    return () => {
+      currentSong.unloadHowl()
+    }
+  }, [currentSong])
+
+
   useEffect(() => {
     if (!currentSong.duration) return
-    const intervalId = setInterval(() => {
-      const secondsPassed = currentSong.howl.seek()
-      const percentage = (secondsPassed / currentSong.duration) * 100
-      setProgress(percentage)
-    }, 1000)
+
+    let intervalId
+    if (isPlaying) {
+      intervalId = setInterval(() => {
+        const secondsPassed = currentSong.howl.seek()
+        const percentage = (secondsPassed / currentSong.duration) * 100
+        setProgress(percentage)
+      }, 500)
+    }
 
     return () => clearInterval(intervalId)
-  }, [currentSong.duration])
+  }, [isPlaying, currentSong])
+
 
   // seek the song if the value of the seek state changes
   useEffect(() => {
     const seconds = (seek / 100) * currentSong.duration
     currentSong.howl.seek(seconds)
   }, [seek])
+
 
   // Handle isPlaying state
   useEffect(() => {
@@ -96,6 +114,7 @@ function Player() {
     }
   }, [isPlaying])
 
+
   // Handle spacebar
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -109,10 +128,12 @@ function Player() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
+
   // Button controls
   const handlePlayPause = () => {
     setIsPlaying(prev => !prev)
   }
+
 
   useEffect(() => {
     const playlistButton = playlistButtonRef.current
@@ -123,6 +144,48 @@ function Player() {
     playlistButton.addEventListener('click', handleClick)
     return () => playlistButton.removeEventListener('click', handleClick)
   }, [])
+
+
+  function changeSong(direction) {
+    const idx = songs.findIndex(s => s === currentSong)
+    let newIdx = direction === 'nextSong' ? idx + 1 : idx - 1
+  
+    if (newIdx >= 0 && newIdx < songs.length) {
+      setCurrentSong(songs[newIdx])
+      setIsPlaying(true)
+    }
+  }
+
+
+  function handleLoop() {
+    loop ? setLoop(false) : setLoop(true)
+  }
+
+
+  useEffect(() => {
+    const howl = currentSong.howl
+    if (!howl) return
+
+    const handleEnd = () => {
+      console.log('song ended')
+      if (loop) {
+        console.log('playing the same song')
+        howl.play()
+      } else {
+        console.log('playing next song')
+        const idx = songs.findIndex(s => s == currentSong)
+        const nextSong = songs[idx + 1]
+        setCurrentSong(nextSong)
+      }
+    }
+
+    howl.on('end', handleEnd)
+
+    return () => {
+      howl.off('end', handleEnd)
+    }
+  }, [loop, currentSong, songs, seek])
+
 
   return (
     <div id="player">
@@ -150,14 +213,39 @@ function Player() {
       <div className="controls">
         <div className="controls-shuffle-repeat">
           <FontAwesomeIcon icon={faShuffle} />
-          <FontAwesomeIcon icon={faRepeat} />
+          <FontAwesomeIcon 
+            icon={faRepeat} 
+            className='loop-button'
+            onClick={handleLoop}
+            style={{
+              color: loop ? 'violet' : 'black',
+              transform: loop ? 'scale(110%)' : 'scale(100%)'
+            }}
+          />
         </div>
 
         <div className="controls-main">
-          <FontAwesomeIcon icon={faBackward} />
-          {!isPlaying && <FontAwesomeIcon icon={faPlay} onClick={handlePlayPause} />}
-          {isPlaying && <FontAwesomeIcon icon={faPause} onClick={handlePlayPause} />}
-          <FontAwesomeIcon icon={faForward} />
+          <FontAwesomeIcon 
+            icon={faBackward} 
+            onClick={() => changeSong('previousSong')}
+          />
+
+          {!isPlaying && 
+            <FontAwesomeIcon 
+            icon={faPlay} 
+            onClick={handlePlayPause} 
+          />}
+
+          {isPlaying && 
+          <FontAwesomeIcon 
+            icon={faPause} 
+            onClick={handlePlayPause} 
+          />}
+
+          <FontAwesomeIcon 
+            icon={faForward} 
+            onClick={() => changeSong('nextSong')}
+          />
         </div>
 
         <div className="control-playlist">
@@ -177,5 +265,3 @@ function Player() {
 }
 
 export default Player
-
-
